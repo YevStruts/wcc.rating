@@ -1,0 +1,10 @@
+version: "3.8"
+
+services:
+  wcc_gateway:
+    build: . # build the Docker image 
+    container_name: wcc.rating
+    image: wcc.rating.i
+    ports:
+      - "6001:80"
+      - "6002:443"
