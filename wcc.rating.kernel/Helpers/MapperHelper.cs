@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using wcc.rating.Infrastructure;
+using wcc.rating.kernel.Models;
 
 namespace wcc.rating.kernel.Helpers
 {
@@ -23,8 +25,7 @@ namespace wcc.rating.kernel.Helpers
                 {
                     var config = new MapperConfiguration(cfg =>
                     {
-                        //cfg.CreateMap<News, NewsModel>()
-                        //    .ForMember(dest => dest.Image_url, act => act.MapFrom(src => src.ImageUrl));
+                        cfg.CreateMap<Game, GameModel>().ReverseMap();
                     });
 
                     instance = new Mapper(config);

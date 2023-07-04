@@ -9,10 +9,10 @@ namespace wcc.rating.data
 {
     public interface IDataRepository
     {
+        bool SaveRating(List<Rating> rating);
         List<Rating> GetRating();
 
-        bool SaveGame();
-
-        bool UpdateGame();
+        bool SaveGame(Game game);
+        bool SaveGames(List<Game> games);
     }
 }

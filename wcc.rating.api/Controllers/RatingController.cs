@@ -23,5 +23,11 @@ namespace wcc.rating.api.Controllers
         {
             return _mediator.Send(new GetRatingQuery());
         }
+
+        [HttpPost]
+        public Task Add(List<RatingModel> rating)
+        {
+            return _mediator.Send(new AddRatingQuery(rating));
+        }
     }
 }

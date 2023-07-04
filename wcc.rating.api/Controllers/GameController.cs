@@ -18,22 +18,10 @@ namespace wcc.rating.api.Controllers
             _mediator = mediator;
         }
 
-        [HttpGet, Route("{id}")]
-        public Task<GameModel> Get(int id)
+        [HttpPost, Route("Save")]
+        public Task Save(GameModel model)
         {
-            return _mediator.Send(new GetGameQuery(id));
-        }
-
-        [HttpPost, Route("SaveOrUpdate")]
-        public Task SaveOrUpdate(GameModel model)
-        {
-            return _mediator.Send(new SaveOrUpdateGameQuery());
-        }
-
-        [HttpPost, Route("Delete")]
-        public Task Delete(GameModel model)
-        {
-            return _mediator.Send(new DeleteGameQuery());
+            return _mediator.Send(new SaveGameQuery(model));
         }
     }
 }

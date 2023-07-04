@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace wcc.rating.kernel.Models
+namespace wcc.rating.Infrastructure
 {
-    public class GameModel
+    public class Game
     {
         public long GameId { get; set; }
         public long HPlayerId { get; set; }
