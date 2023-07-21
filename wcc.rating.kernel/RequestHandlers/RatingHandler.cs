@@ -43,10 +43,11 @@ namespace wcc.rating.kernel.RequestHandlers
 
         public Task<List<RatingModel>> Handle(GetRatingQuery request, CancellationToken cancellationToken)
         {
-            var model = new List<RatingModel>()
-            {
-                new RatingModel() { PlayerId = 1, Points = 1000 }
-            };
+            List<Rating> rating = _db.GetRating();
+
+            var model = new List<RatingModel>();
+            rating.ForEach(r => model.Add(_mapper.Map<RatingModel>(r)));
+            
             return Task.FromResult(model);
         }
 
