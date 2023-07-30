@@ -8,10 +8,10 @@ EXPOSE 443
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src
 COPY ["wcc.rating.api/wcc.rating.api.csproj", "wcc.rating.api/"]
-# COPY ["wcc.rating.kernel/wcc.rating.kernel.csproj", "wcc.rating.kernel/"]
-# COPY ["wcc.rating.data/wcc.rating.data.csproj", "wcc.rating.data/"]
+COPY ["wcc.rating.kernel/wcc.rating.kernel.csproj", "wcc.rating.kernel/"]
+COPY ["wcc.rating.data/wcc.rating.data.csproj", "wcc.rating.data/"]
 # COPY ["wcc.rating.integrations/wcc.rating.integrations.csproj", "wcc.rating.integrations/"]
-# COPY ["wcc.rating/wcc.rating.csproj", "wcc.rating/"]
+COPY ["wcc.rating/wcc.rating.csproj", "wcc.rating/"]
 RUN dotnet restore "wcc.rating.api/wcc.rating.api.csproj"
 COPY . .
 WORKDIR "/src/wcc.rating.api"

@@ -20,7 +20,7 @@ namespace wcc.rating.data
             {
                 var store = new DocumentStore
                 {
-                    Urls = new[] { "http://localhost:8080" },
+                    Urls = new[] { "http://wcc-cossacks.com:8080" },
                     Database = "wcc.rating"
                 };
 
