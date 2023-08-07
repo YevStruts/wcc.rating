@@ -1,8 +1,8 @@
 ﻿namespace wcc.rating.kernel.Helpers
 {
-    internal static class EloHelper
+    public static class EloHelper
     {
-        internal static Tuple<double, double> Count(double hplayer, double vplayer, double score, double hFactor, double vFactor)
+        public static Tuple<double, double> Count(double hplayer, double vplayer, double score, double hFactor, double vFactor)
         {
             // Calculate expected scores
             double expectedScorePlayer = 1 / (1 + Math.Pow(10, (vplayer - hplayer) / 400));
@@ -15,7 +15,7 @@
             return Tuple.Create(newRatingPlayer, newRatingOpponent);
         }
 
-        internal static double GetKFactor(int position)
+        public static double GetKFactor(int position)
         {
             if (position < 10)
                 return 10.0;
