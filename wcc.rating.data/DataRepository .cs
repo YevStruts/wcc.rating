@@ -15,9 +15,10 @@ namespace wcc.rating.data
         {
             using (IDocumentSession session = DocumentStoreHolder.Store.OpenSession())
             {
+                var prevRatings = session.Query<Rating>().ToList();
                 rating.ForEach(r =>
                 {
-                    var ratingDto = session.Query<Rating>().Where(x => x.PlayerId == r.PlayerId).FirstOrDefault();
+                    var ratingDto = prevRatings.Where(x => x.PlayerId == r.PlayerId).FirstOrDefault();
                     if (ratingDto != null)
                     {
                         ratingDto.Points = r.Points;
