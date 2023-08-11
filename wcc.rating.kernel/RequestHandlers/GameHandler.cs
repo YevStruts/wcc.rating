@@ -37,34 +37,36 @@ namespace wcc.rating.kernel.RequestHandlers
             if (!_db.SaveGame(game))
                 return Task.FromResult(false);
 
-            var scores = ScoreHelper.GetBO3Score(request.Game.HScore, request.Game.VScore);
+            return Task.FromResult(true);
 
-            var rating = _db.GetRating().OrderBy(r => r.Points).ToList();
+            //var scores = ScoreHelper.GetBO3Score(request.Game.HScore, request.Game.VScore);
 
-            Rating hRating = rating.FirstOrDefault(r => r.PlayerId == request.Game.HPlayerId) ??
-                new Rating() { PlayerId = request.Game.HPlayerId, Points = 1000 };
+            //var rating = _db.GetRating().OrderBy(r => r.Points).ToList();
 
-            Rating vRating = rating.FirstOrDefault(r => r.PlayerId == request.Game.VPlayerId) ??
-                new Rating() { PlayerId = request.Game.VPlayerId, Points = 1000 };
+            //Rating hRating = rating.FirstOrDefault(r => r.PlayerId == request.Game.HPlayerId) ??
+            //    new Rating() { PlayerId = request.Game.HPlayerId, Points = 1000 };
 
-            var hPosition = rating.IndexOf(hRating);
-            if (hPosition == -1) hPosition = rating.Count + 1;
-            double hFactor = EloHelper.GetKFactor(hPosition);
+            //Rating vRating = rating.FirstOrDefault(r => r.PlayerId == request.Game.VPlayerId) ??
+            //    new Rating() { PlayerId = request.Game.VPlayerId, Points = 1000 };
 
-            var vPosition = rating.IndexOf(vRating);
-            if (vPosition == -1) vPosition = rating.Count + 1;
-            double vFactor = EloHelper.GetKFactor(vPosition);
+            //var hPosition = rating.IndexOf(hRating);
+            //if (hPosition == -1) hPosition = rating.Count + 1;
+            //double hFactor = EloHelper.GetKFactor(hPosition);
 
-            var newRating = EloHelper.Count(hRating.Points, vRating.Points, scores.Item1, hFactor, vFactor);
+            //var vPosition = rating.IndexOf(vRating);
+            //if (vPosition == -1) vPosition = rating.Count + 1;
+            //double vFactor = EloHelper.GetKFactor(vPosition);
 
-            var hprogress = Convert.ToInt32(newRating.Item1);
-            var vprogress = Convert.ToInt32(newRating.Item2);
+            //var newRating = EloHelper.Count(hRating.Points, vRating.Points, scores.Item1, hFactor, vFactor);
 
-            return Task.FromResult(_db.SaveRating(new List<Rating>
-            {
-                new Rating { PlayerId = request.Game.HPlayerId, Points = hprogress },
-                new Rating { PlayerId = request.Game.VPlayerId, Points = vprogress }
-            }));
+            //var hprogress = Convert.ToInt32(newRating.Item1);
+            //var vprogress = Convert.ToInt32(newRating.Item2);
+
+            //return Task.FromResult(_db.SaveRating(new List<Rating>
+            //{
+            //    new Rating { PlayerId = request.Game.HPlayerId, Points = hprogress },
+            //    new Rating { PlayerId = request.Game.VPlayerId, Points = vprogress }
+            //}));
         }
     }
 }

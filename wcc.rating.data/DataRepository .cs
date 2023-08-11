@@ -44,6 +44,22 @@ namespace wcc.rating.data
             return rating;
         }
 
+        public Game? GetGame(long gameId)
+        {
+            using (IDocumentSession session = DocumentStoreHolder.Store.OpenSession())
+            {
+                return session.Query<Game>().FirstOrDefault(g => g.GameId == gameId);
+            }
+        }
+
+        public List<Game> GetGames()
+        {
+            using (IDocumentSession session = DocumentStoreHolder.Store.OpenSession())
+            {
+                return session.Query<Game>().ToList();
+            }
+        }
+
         public bool SaveGame(Game game)
         {
             using (IDocumentSession session = DocumentStoreHolder.Store.OpenSession())
