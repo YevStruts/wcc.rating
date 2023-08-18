@@ -48,7 +48,7 @@ namespace wcc.rating.kernel.RequestHandlers
 
             var model = new List<RatingModel>();
             rating.ForEach(r => model.Add(_mapper.Map<RatingModel>(r)));
-            
+
             #region Calculate rating
             List<Game> games = _db.GetGames();
             foreach (var game in games)
@@ -61,15 +61,22 @@ namespace wcc.rating.kernel.RequestHandlers
                 var vRating = model.FirstOrDefault(r => r.PlayerId == GetPlayerIdQuickFix(game.VPlayerId)) ??
                     new RatingModel() { PlayerId = game.VPlayerId, Points = 1000 };
 
-                var hPosition = model.IndexOf(hRating);
+                var newRatingAtMoment = model.OrderByDescending(p => p.Points).ToList();
+
+                var hPosition = newRatingAtMoment.IndexOf(hRating);
                 if (hPosition == -1) hPosition = model.Count + 1;
                 double hFactor = EloHelper.GetKFactor(hPosition);
 
-                var vPosition = model.IndexOf(vRating);
+                var vPosition = newRatingAtMoment.IndexOf(vRating);
                 if (vPosition == -1) vPosition = model.Count + 1;
                 double vFactor = EloHelper.GetKFactor(vPosition);
 
-                var newRating = EloHelper.Count(hRating.Points, vRating.Points, scores.Item1, hFactor, vFactor);
+                // kFactor of lower rated player
+                double kFactorLower = hPosition > vPosition ? hFactor : vFactor;
+
+                var newRating = EloHelper.Count(hRating.Points, vRating.Points, scores.Item1,
+                    game.HScore >= game.VScore ? hFactor : kFactorLower,
+                    game.VScore >= game.HScore ? vFactor : kFactorLower);
 
                 var hprogress = Convert.ToInt32(newRating.Item1);
                 var vprogress = Convert.ToInt32(newRating.Item2);

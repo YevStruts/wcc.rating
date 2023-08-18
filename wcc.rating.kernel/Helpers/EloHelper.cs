@@ -17,13 +17,12 @@
 
         public static double GetKFactor(int position)
         {
-            if (position < 10)
-                return 10.0;
-            if (position < 20)
-                return 20.0;
-            if (position < 30)
-                return 30.0;
-            return 40.0;
+            if (position > 40)
+                return 32.0;
+
+            double positionFactor = position / 40.0 * 100.0;
+
+            return /* koef */ 20.0 / 100.0 * positionFactor + 10.0;
         }
     }
 }
