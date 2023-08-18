@@ -3,6 +3,7 @@ using MediatR;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using wcc.rating.data;
@@ -54,10 +55,10 @@ namespace wcc.rating.kernel.RequestHandlers
             {
                 var scores = ScoreHelper.GetBO3Score(game.HScore, game.VScore);
 
-                var hRating = model.FirstOrDefault(r => r.PlayerId == game.HPlayerId) ??
+                var hRating = model.FirstOrDefault(r => r.PlayerId == GetPlayerIdQuickFix(game.HPlayerId)) ??
                     new RatingModel() { PlayerId = game.HPlayerId, Points = 1000 };
 
-                var vRating = model.FirstOrDefault(r => r.PlayerId == game.VPlayerId) ??
+                var vRating = model.FirstOrDefault(r => r.PlayerId == GetPlayerIdQuickFix(game.VPlayerId)) ??
                     new RatingModel() { PlayerId = game.VPlayerId, Points = 1000 };
 
                 var hPosition = model.IndexOf(hRating);
@@ -73,8 +74,8 @@ namespace wcc.rating.kernel.RequestHandlers
                 var hprogress = Convert.ToInt32(newRating.Item1);
                 var vprogress = Convert.ToInt32(newRating.Item2);
 
-                model.First(p => p.PlayerId == game.HPlayerId).Points = hprogress;
-                model.First(p => p.PlayerId == game.VPlayerId).Points = vprogress;
+                model.First(p => p.PlayerId == GetPlayerIdQuickFix(game.HPlayerId)).Points = hprogress;
+                model.First(p => p.PlayerId == GetPlayerIdQuickFix(game.VPlayerId)).Points = vprogress;
             }
             #endregion
             
@@ -85,6 +86,12 @@ namespace wcc.rating.kernel.RequestHandlers
         {
             var rating = _mapper.Map<List<Rating>>(request.Rating);
             return Task.FromResult(_db.SaveRating(rating));
+        }
+
+        private long GetPlayerIdQuickFix(long playerId)
+        {
+            // fix for Fenrir
+            return playerId == 97 ? 44 : playerId;
         }
     }
 }
