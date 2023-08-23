@@ -55,19 +55,17 @@ namespace wcc.rating.kernel.RequestHandlers
             {
                 var scores = ScoreHelper.GetBO3Score(game.HScore, game.VScore);
 
-                var hRating = model.FirstOrDefault(r => r.PlayerId == GetPlayerIdQuickFix(game.HPlayerId)) ??
-                    new RatingModel() { PlayerId = game.HPlayerId, Points = 1000 };
+                var hRating = getAndAddRatingIfMissing(game.HPlayerId, ref model);
 
-                var vRating = model.FirstOrDefault(r => r.PlayerId == GetPlayerIdQuickFix(game.VPlayerId)) ??
-                    new RatingModel() { PlayerId = game.VPlayerId, Points = 1000 };
+                var vRating = getAndAddRatingIfMissing(game.VPlayerId, ref model);
 
-                var newRatingAtMoment = model.OrderByDescending(p => p.Points).ToList();
+                var modelOrdered = model.OrderByDescending(p => p.Points).ToList();
 
-                var hPosition = newRatingAtMoment.IndexOf(hRating);
+                var hPosition = modelOrdered.IndexOf(hRating);
                 if (hPosition == -1) hPosition = model.Count + 1;
                 double hFactor = EloHelper.GetKFactor(hPosition);
 
-                var vPosition = newRatingAtMoment.IndexOf(vRating);
+                var vPosition = modelOrdered.IndexOf(vRating);
                 if (vPosition == -1) vPosition = model.Count + 1;
                 double vFactor = EloHelper.GetKFactor(vPosition);
 
@@ -93,6 +91,16 @@ namespace wcc.rating.kernel.RequestHandlers
         {
             var rating = _mapper.Map<List<Rating>>(request.Rating);
             return Task.FromResult(_db.SaveRating(rating));
+        }
+
+        private RatingModel getAndAddRatingIfMissing(long playerId, ref List<RatingModel> model)
+        {
+            if (!model.Any(r => r.PlayerId == GetPlayerIdQuickFix(playerId)))
+            {
+                model.Add(new RatingModel() { PlayerId = playerId, Points = 1000 });
+            }
+
+            return model.First(r => r.PlayerId == GetPlayerIdQuickFix(playerId));
         }
 
         private long GetPlayerIdQuickFix(long playerId)
