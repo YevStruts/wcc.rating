@@ -13,20 +13,26 @@ namespace wcc.rating.data
     // and is capable of working with multiple databases at once.
     // Due to it's nature, it is recommended to have only one
     // singleton instance per application
-    internal static class DocumentStoreHolder
+    public static class DocumentStoreHolder
     {
+        private static string? _connectionString;
+        public static void Init(string connectionString)
+        {
+            _connectionString = connectionString;
+        }
+
         private static readonly Lazy<IDocumentStore> LazyStore =
             new Lazy<IDocumentStore>(() =>
             {
                 var store = new DocumentStore
                 {
-                    Urls = new[] { "http://wcc-cossacks.com:8080" },
+                    Urls = new[] { _connectionString },
                     Database = "wcc.rating"
                 };
 
                 return store.Initialize();
             });
 
-        public static IDocumentStore Store => LazyStore.Value;
+        internal static IDocumentStore Store => LazyStore.Value;
     }
 }

@@ -15,6 +15,8 @@ builder.Services.AddTransient<IDataRepository, DataRepository>();
 
 var app = builder.Build();
 
+DocumentStoreHolder.Init(app.Configuration.GetConnectionString("DefaultConnection"));
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
