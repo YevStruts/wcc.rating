@@ -69,6 +69,12 @@ namespace wcc.rating.kernel.RequestHandlers
                 if (vPosition == -1) vPosition = model.Count + 1;
                 double vFactor = EloHelper.GetKFactor(vPosition);
 
+                if (game.IsTechScored)
+                {
+                    hFactor /= 4.0;
+                    vFactor /= 4.0;
+                }
+
                 // kFactor of lower rated player
                 double kFactorLower = hPosition > vPosition ? hFactor : vFactor;
 

@@ -13,5 +13,6 @@ namespace wcc.rating.Infrastructure
         public int HScore { get; set; }
         public long VPlayerId { get; set; }
         public int VScore { get; set; }
+        public bool IsTechScored { get; set; }
     }
 }
