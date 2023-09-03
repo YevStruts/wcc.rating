@@ -71,8 +71,8 @@ namespace wcc.rating.kernel.RequestHandlers
 
                 if (game.IsTechScored)
                 {
-                    hFactor /= 4.0;
-                    vFactor /= 4.0;
+                    hFactor /= 2.0;
+                    vFactor /= 2.0;
                 }
 
                 // kFactor of lower rated player
