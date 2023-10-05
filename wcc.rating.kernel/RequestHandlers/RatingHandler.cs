@@ -53,6 +53,9 @@ namespace wcc.rating.kernel.RequestHandlers
             List<Game> games = _db.GetGames();
             foreach (var game in games)
             {
+                if (game.HScore == 0 && game.VScore == 0)
+                    continue;
+
                 var scores = ScoreHelper.GetBO3Score(game.HScore, game.VScore);
 
                 var hRating = getAndAddRatingIfMissing(game.HPlayerId, ref model);
