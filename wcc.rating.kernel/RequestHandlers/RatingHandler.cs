@@ -114,8 +114,11 @@ namespace wcc.rating.kernel.RequestHandlers
 
         private long GetPlayerIdQuickFix(long playerId)
         {
-            // fix for Fenrir
-            return playerId == 97 ? 44 : playerId;
+            if (playerId == 97 /* fenrir-miracle */) 
+                return 44;
+            if (playerId == 157 /* supermati-spoxmati */)
+                return 56;
+            return playerId;
         }
     }
 }
