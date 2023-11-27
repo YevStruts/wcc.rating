@@ -56,40 +56,43 @@ namespace wcc.rating.kernel.RequestHandlers
                 if (game.HScore == 0 && game.VScore == 0)
                     continue;
 
-                var scores = ScoreHelper.GetBO3Score(game.HScore, game.VScore);
-
-                var hRating = getAndAddRatingIfMissing(game.HPlayerId, ref model);
-
-                var vRating = getAndAddRatingIfMissing(game.VPlayerId, ref model);
-
-                var modelOrdered = model.OrderByDescending(p => p.Points).ToList();
-
-                var hPosition = modelOrdered.IndexOf(hRating);
-                if (hPosition == -1) hPosition = model.Count + 1;
-                double hFactor = EloHelper.GetKFactor(hPosition);
-
-                var vPosition = modelOrdered.IndexOf(vRating);
-                if (vPosition == -1) vPosition = model.Count + 1;
-                double vFactor = EloHelper.GetKFactor(vPosition);
-
-                if (game.IsTechScored)
+                if (game.GameType == GameType.Individual)
                 {
-                    hFactor /= 2.0;
-                    vFactor /= 2.0;
+                    var scores = ScoreHelper.GetBO3Score(game.HScore, game.VScore);
+
+                    var hRating = getAndAddRatingIfMissing(game.HPlayerId, ref model);
+
+                    var vRating = getAndAddRatingIfMissing(game.VPlayerId, ref model);
+
+                    var modelOrdered = model.OrderByDescending(p => p.Points).ToList();
+
+                    var hPosition = modelOrdered.IndexOf(hRating);
+                    if (hPosition == -1) hPosition = model.Count + 1;
+                    double hFactor = EloHelper.GetKFactor(hPosition);
+
+                    var vPosition = modelOrdered.IndexOf(vRating);
+                    if (vPosition == -1) vPosition = model.Count + 1;
+                    double vFactor = EloHelper.GetKFactor(vPosition);
+
+                    if (game.IsTechScored)
+                    {
+                        hFactor /= 2.0;
+                        vFactor /= 2.0;
+                    }
+
+                    // kFactor of lower rated player
+                    double kFactorLower = hPosition > vPosition ? hFactor : vFactor;
+
+                    var newRating = EloHelper.Count(hRating.Points, vRating.Points, scores.Item1,
+                        game.HScore >= game.VScore ? hFactor : kFactorLower,
+                        game.VScore >= game.HScore ? vFactor : kFactorLower);
+
+                    var hprogress = Convert.ToInt32(newRating.Item1);
+                    var vprogress = Convert.ToInt32(newRating.Item2);
+
+                    model.First(p => p.PlayerId == GetPlayerIdQuickFix(game.HPlayerId)).Points = hprogress;
+                    model.First(p => p.PlayerId == GetPlayerIdQuickFix(game.VPlayerId)).Points = vprogress;
                 }
-
-                // kFactor of lower rated player
-                double kFactorLower = hPosition > vPosition ? hFactor : vFactor;
-
-                var newRating = EloHelper.Count(hRating.Points, vRating.Points, scores.Item1,
-                    game.HScore >= game.VScore ? hFactor : kFactorLower,
-                    game.VScore >= game.HScore ? vFactor : kFactorLower);
-
-                var hprogress = Convert.ToInt32(newRating.Item1);
-                var vprogress = Convert.ToInt32(newRating.Item2);
-
-                model.First(p => p.PlayerId == GetPlayerIdQuickFix(game.HPlayerId)).Points = hprogress;
-                model.First(p => p.PlayerId == GetPlayerIdQuickFix(game.VPlayerId)).Points = vprogress;
             }
             #endregion
             
