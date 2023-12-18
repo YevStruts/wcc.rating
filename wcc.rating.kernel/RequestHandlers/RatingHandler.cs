@@ -200,7 +200,13 @@ namespace wcc.rating.kernel.RequestHandlers
             if (playerId == 97 /* fenrir-miracle */) 
                 return 44;
             if (playerId == 157 /* supermati-spoxmati */)
-                return 56;
+                return 56; 
+            if (playerId == 151 /* DaronirYT */)
+                return 136;
+            if (playerId == 183 /* [PR]ELENDOR */)
+                return 159;
+            if (playerId == 158 /* Sake */)
+                return 135;
             return playerId;
         }
     }
