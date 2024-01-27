@@ -99,5 +99,48 @@ namespace wcc.rating.data
             }
             return true;
         }
+
+        #region Rank
+
+        public Rank? GetRank(long playerId)
+        {
+            using (IDocumentSession session = DocumentStoreHolder.Store.OpenSession())
+            {
+                return session.Query<Rank>().FirstOrDefault(/* g => g.GameId == seasonId */);
+            }
+        }
+
+        public List<Rank> GetRanks()
+        {
+            using (IDocumentSession session = DocumentStoreHolder.Store.OpenSession())
+            {
+                return session.Query<Rank>().ToList();
+            }
+        }
+
+        public bool SaveRanks(List<Rank> ranks)
+        {
+            using (IDocumentSession session = DocumentStoreHolder.Store.OpenSession())
+            {
+                var prevRanks = session.Query<Rank>().ToList();
+                ranks.ForEach(r =>
+                {
+                    var rankDto = prevRanks.Where(x => x.PlayerId == r.PlayerId).FirstOrDefault();
+                    if (rankDto != null)
+                    {
+                        rankDto.Score = r.Score;
+                    }
+                    else
+                    {
+                        rankDto = new Rank { PlayerId = r.PlayerId, Score = r.Score };
+                        session.Store(rankDto);
+                    }
+                });
+                session.SaveChanges();
+            }
+            return true;
+        }
+
+        #endregion
     }
 }

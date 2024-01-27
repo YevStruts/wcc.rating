@@ -16,5 +16,9 @@ namespace wcc.rating.data
         List<Game> GetGames();
         bool SaveGame(Game game);
         bool SaveGames(List<Game> games);
+
+        Rank GetRank(long playerId);
+        List<Rank> GetRanks();
+        bool SaveRanks(List<Rank> ranks);
     }
 }

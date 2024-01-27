@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using wcc.rating.Infrastructure;
 using wcc.rating.kernel.Models;
+using wcc.rating.kernel.Models.C3;
 
 namespace wcc.rating.kernel.Helpers
 {
@@ -27,6 +28,7 @@ namespace wcc.rating.kernel.Helpers
                     {
                         cfg.CreateMap<Game, GameModel>().ReverseMap();
                         cfg.CreateMap<Rating, RatingModel>().ReverseMap();
+                        cfg.CreateMap<Rank, C3RankModel>().ReverseMap();
                     });
 
                     instance = new Mapper(config);
