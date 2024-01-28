@@ -56,6 +56,11 @@ namespace wcc.rating.kernel.RequestHandlers
                 if (game.HScore == 0 && game.VScore == 0)
                     continue;
 
+                if (game.GameType == GameType.Teams &&
+                    (game.HParticipants == null || game.VParticipants == null ||
+                    !game.HParticipants.Any() || !game.VParticipants.Any()))
+                    continue;
+
                 var scores = ScoreHelper.GetBO3Score(game.HScore, game.VScore);
 
                 if (game.GameType == GameType.Individual)
