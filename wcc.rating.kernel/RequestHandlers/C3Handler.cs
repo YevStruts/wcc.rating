@@ -44,7 +44,7 @@ namespace wcc.rating.kernel.RequestHandlers
 
         public async Task<List<C3RankModel>> Handle(C3GetRatingQuery request, CancellationToken cancellationToken)
         {
-            var ranks = _db.GetRanks();
+            var ranks = _db.GetRanks().OrderByDescending(r => r.Score).Take(100).ToList();
             return _mapper.Map<List<C3RankModel>>(ranks);
         }
 
