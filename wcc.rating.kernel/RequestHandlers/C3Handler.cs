@@ -22,7 +22,7 @@ namespace wcc.rating.kernel.RequestHandlers
         }
     }
 
-    public class C3SaveGameQuery : IRequest<bool>
+    public class C3SaveGameQuery : IRequest<List<C3SaveRankModel>>
     {
         public List<C3GameResultModel> Result { get; }
         public C3SaveGameQuery(List<C3GameResultModel> result)
@@ -32,7 +32,7 @@ namespace wcc.rating.kernel.RequestHandlers
     }
 
     public class C3Handler : IRequestHandler<C3GetRatingQuery, List<C3RankModel>>,
-        IRequestHandler<C3SaveGameQuery, bool>
+        IRequestHandler<C3SaveGameQuery, List<C3SaveRankModel>>
     {
         private readonly IDataRepository _db;
         private readonly IMapper _mapper = MapperHelper.Instance;
@@ -48,8 +48,9 @@ namespace wcc.rating.kernel.RequestHandlers
             return _mapper.Map<List<C3RankModel>>(ranks);
         }
 
-        public async Task<bool> Handle(C3SaveGameQuery request, CancellationToken cancellationToken)
+        public async Task<List<C3SaveRankModel>> Handle(C3SaveGameQuery request, CancellationToken cancellationToken)
         {
+            var model = new List<C3SaveRankModel>();
             if (request.Result.Any())
             {
                 var ranks = _db.GetRanks();
@@ -61,12 +62,19 @@ namespace wcc.rating.kernel.RequestHandlers
                     var rank = ranks.FirstOrDefault(r => r.PlayerId == playerId);
                     if (rank == null)
                     {
-                        ranks.Add(new Rank
+                        rank = new Rank
                         {
                             PlayerId = playerId,
                             Score = 1000
-                        });
+                        };
+                        ranks.Add(rank);
                     }
+                    model.Add(new C3SaveRankModel
+                    {
+                        PlayerId = rank.PlayerId,
+                        OldScore = rank.Score,
+                        NewScore = rank.Score
+                    });
                 }
 
                 // count points
@@ -97,11 +105,20 @@ namespace wcc.rating.kernel.RequestHandlers
                     ranks.First(p => p.PlayerId == player).Score += progress;
                 }
 
-                _db.SaveRanks(ranks);
-
-                return true;
+                if (_db.SaveRanks(ranks))
+                {
+                    var newRanks = ranks.Where(r => playerIds.Contains(r.PlayerId)).ToList();
+                    foreach (var newRank in newRanks)
+                    {
+                        var rank = model.Find(r => r.PlayerId == newRank.PlayerId);
+                        if (rank != null)
+                        {
+                            rank.NewScore = newRank.Score;
+                        }
+                    }
+                }
             }
-            return false;
+            return model;
         }
     }
 }
