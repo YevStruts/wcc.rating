@@ -17,8 +17,10 @@ namespace wcc.rating.kernel.RequestHandlers
 {
     public class C3GetRatingQuery : IRequest<List<C3RankModel>>
     {
-        public C3GetRatingQuery()
+        public int Id { get; private set; }
+        public C3GetRatingQuery(int id)
         {
+            Id = id;
         }
     }
 
@@ -44,7 +46,7 @@ namespace wcc.rating.kernel.RequestHandlers
 
         public async Task<List<C3RankModel>> Handle(C3GetRatingQuery request, CancellationToken cancellationToken)
         {
-            var ranks = _db.GetRanks().OrderByDescending(r => r.Score).Take(100).ToList();
+            var ranks = _db.GetRanks().Where(r => r.RankId == request.Id).OrderByDescending(r => r.Score).Take(100).ToList();
             return _mapper.Map<List<C3RankModel>>(ranks);
         }
 
