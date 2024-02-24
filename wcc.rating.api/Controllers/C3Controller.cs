@@ -20,15 +20,15 @@ namespace wcc.rating.api.Controllers
         }
 
         [HttpGet, Route("Rating/{id}")]
-        public async Task<List<C3RankModel>> Get(int id)
+        public async Task<C3RankModel> Get(int id)
         {
             return await _mediator.Send(new C3GetRatingQuery(id));
         }
 
         [HttpPost, Route("Save")]
-        public async Task<List<C3SaveRankModel>> Save(List<C3GameResultModel> model)
+        public async Task<List<C3SaveRankModel>> Save(C3GameResultModel model)
         {
-            return await _mediator.Send(new C3SaveGameQuery(model));
+            return await _mediator.Send(new C3SaveGameQuery(model.RankId, model.Items));
         }
     }
 }

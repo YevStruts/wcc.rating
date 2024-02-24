@@ -15,7 +15,7 @@ using wcc.rating.kernel.Models.C3;
 
 namespace wcc.rating.kernel.RequestHandlers
 {
-    public class C3GetRatingQuery : IRequest<List<C3RankModel>>
+    public class C3GetRatingQuery : IRequest<C3RankModel>
     {
         public int Id { get; private set; }
         public C3GetRatingQuery(int id)
@@ -26,14 +26,16 @@ namespace wcc.rating.kernel.RequestHandlers
 
     public class C3SaveGameQuery : IRequest<List<C3SaveRankModel>>
     {
-        public List<C3GameResultModel> Result { get; }
-        public C3SaveGameQuery(List<C3GameResultModel> result)
+        public int RankId { get; private set; }
+        public List<C3GameItemResultModel> Result { get; }
+        public C3SaveGameQuery(int rankId, List<C3GameItemResultModel> result)
         {
+            this.RankId = rankId;
             this.Result = result;
         }
     }
 
-    public class C3Handler : IRequestHandler<C3GetRatingQuery, List<C3RankModel>>,
+    public class C3Handler : IRequestHandler<C3GetRatingQuery, C3RankModel>,
         IRequestHandler<C3SaveGameQuery, List<C3SaveRankModel>>
     {
         private readonly IDataRepository _db;
@@ -44,10 +46,11 @@ namespace wcc.rating.kernel.RequestHandlers
             _db = db;
         }
 
-        public async Task<List<C3RankModel>> Handle(C3GetRatingQuery request, CancellationToken cancellationToken)
+        public async Task<C3RankModel> Handle(C3GetRatingQuery request, CancellationToken cancellationToken)
         {
             var ranks = _db.GetRanks().Where(r => r.RankId == request.Id).OrderByDescending(r => r.Score).Take(100).ToList();
-            return _mapper.Map<List<C3RankModel>>(ranks);
+            var items = _mapper.Map<List<C3RankItemModel>>(ranks);
+            return new C3RankModel {  RankId = request.Id, Items = items };
         }
 
         public async Task<List<C3SaveRankModel>> Handle(C3SaveGameQuery request, CancellationToken cancellationToken)
@@ -55,7 +58,7 @@ namespace wcc.rating.kernel.RequestHandlers
             var model = new List<C3SaveRankModel>();
             if (request.Result.Any())
             {
-                var ranks = _db.GetRanks();
+                var ranks = _db.GetRanks().Where(r => r.RankId == request.RankId).ToList();
 
                 // if player missing in rank
                 var playerIds = request.Result.Select(r => r.player_id).ToArray();
@@ -107,7 +110,7 @@ namespace wcc.rating.kernel.RequestHandlers
                     ranks.First(p => p.PlayerId == player).Score += progress;
                 }
 
-                if (_db.SaveRanks(ranks))
+                if (_db.SaveRanks(request.RankId, ranks))
                 {
                     var newRanks = ranks.Where(r => playerIds.Contains(r.PlayerId)).ToList();
                     foreach (var newRank in newRanks)

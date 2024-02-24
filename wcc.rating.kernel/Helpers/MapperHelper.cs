@@ -28,7 +28,7 @@ namespace wcc.rating.kernel.Helpers
                     {
                         cfg.CreateMap<Game, GameModel>().ReverseMap();
                         cfg.CreateMap<Rating, RatingModel>().ReverseMap();
-                        cfg.CreateMap<Rank, C3RankModel>().ReverseMap();
+                        cfg.CreateMap<Rank, C3RankItemModel>().ReverseMap();
                     });
 
                     instance = new Mapper(config);

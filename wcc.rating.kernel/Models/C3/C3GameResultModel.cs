@@ -8,7 +8,7 @@ namespace wcc.rating.kernel.Models.C3
 {
     public class C3GameResultModel
     {
-        public long player_id { get; set; }
-        public int result { get; set; }
+        public int RankId { get; set; }
+        public List<C3GameItemResultModel> Items { get; set; }
     }
 }

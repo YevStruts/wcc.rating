@@ -118,11 +118,11 @@ namespace wcc.rating.data
             }
         }
 
-        public bool SaveRanks(List<Rank> ranks)
+        public bool SaveRanks(int rankId, List<Rank> ranks)
         {
             using (IDocumentSession session = DocumentStoreHolder.Store.OpenSession())
             {
-                var prevRanks = session.Query<Rank>().ToList();
+                var prevRanks = session.Query<Rank>().Where(r => r.RankId == rankId).ToList();
                 ranks.ForEach(r =>
                 {
                     var rankDto = prevRanks.Where(x => x.PlayerId == r.PlayerId).FirstOrDefault();

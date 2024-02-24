@@ -19,6 +19,6 @@ namespace wcc.rating.data
 
         Rank GetRank(long playerId);
         List<Rank> GetRanks();
-        bool SaveRanks(List<Rank> ranks);
+        bool SaveRanks(int rankId, List<Rank> ranks);
     }
 }
