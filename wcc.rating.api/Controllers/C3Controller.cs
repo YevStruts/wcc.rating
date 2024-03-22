@@ -28,7 +28,7 @@ namespace wcc.rating.api.Controllers
         [HttpPost, Route("Save")]
         public async Task<List<C3SaveRankModel>> Save(C3GameResultModel model)
         {
-            return await _mediator.Send(new C3SaveGameQuery(model.RankId, model.Items));
+            return await _mediator.Send(new C3SaveGameQuery(model));
         }
     }
 }

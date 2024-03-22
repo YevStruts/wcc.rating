@@ -26,11 +26,9 @@ namespace wcc.rating.kernel.RequestHandlers
 
     public class C3SaveGameQuery : IRequest<List<C3SaveRankModel>>
     {
-        public int RankId { get; private set; }
-        public List<C3GameItemResultModel> Result { get; }
-        public C3SaveGameQuery(int rankId, List<C3GameItemResultModel> result)
+        public C3GameResultModel Result { get; private set; }
+        public C3SaveGameQuery(C3GameResultModel result)
         {
-            this.RankId = rankId;
             this.Result = result;
         }
     }
@@ -56,12 +54,12 @@ namespace wcc.rating.kernel.RequestHandlers
         public async Task<List<C3SaveRankModel>> Handle(C3SaveGameQuery request, CancellationToken cancellationToken)
         {
             var model = new List<C3SaveRankModel>();
-            if (request.Result.Any())
+            if (request.Result.Items.Any())
             {
-                var ranks = _db.GetRanks().Where(r => r.RankId == request.RankId).ToList();
+                var ranks = _db.GetRanks().Where(r => r.RankId == request.Result.RankId).ToList();
 
                 // if player missing in rank
-                var playerIds = request.Result.Select(r => r.player_id).ToArray();
+                var playerIds = request.Result.Items.Select(r => r.player_id).ToArray();
                 foreach (var playerId in playerIds)
                 {
                     var rank = ranks.FirstOrDefault(r => r.PlayerId == playerId);
@@ -83,8 +81,8 @@ namespace wcc.rating.kernel.RequestHandlers
                 }
 
                 // count points
-                var winners = request.Result.Where(r => r.result == (int)GameResult.WIN).Select(r => r.player_id).ToList();
-                var losers = request.Result.Where(r => r.result == (int)GameResult.LOSE).Select(r => r.player_id).ToList();
+                var winners = request.Result.Items.Where(r => r.result == (int)GameResult.WIN).Select(r => r.player_id).ToList();
+                var losers = request.Result.Items.Where(r => r.result == (int)GameResult.LOSE).Select(r => r.player_id).ToList();
 
                 var av_rank_winners = (float)ranks.Where(r => winners.Contains(r.PlayerId)).Sum(r => r.Score) / (float)winners.Count;
                 var av_rank_losers = (float)ranks.Where(r => losers.Contains(r.PlayerId)).Sum(r => r.Score) / (float)losers.Count;
@@ -110,7 +108,7 @@ namespace wcc.rating.kernel.RequestHandlers
                     ranks.First(p => p.PlayerId == player).Score += progress;
                 }
 
-                if (_db.SaveRanks(request.RankId, ranks))
+                if (_db.SaveRanks(request.Result.RankId, ranks))
                 {
                     var newRanks = ranks.Where(r => playerIds.Contains(r.PlayerId)).ToList();
                     foreach (var newRank in newRanks)
