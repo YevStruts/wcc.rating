@@ -1,10 +1,13 @@
-﻿using Raven.Client.Documents.Session;
+﻿using Raven.Client.Documents.Indexes;
+using Raven.Client.Documents.Queries;
+using Raven.Client.Documents.Session;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using wcc.rating.Infrastructure;
+using static System.Collections.Specialized.BitVector32;
 using static System.Formats.Asn1.AsnWriter;
 
 namespace wcc.rating.data
@@ -42,6 +45,24 @@ namespace wcc.rating.data
                 rating.AddRange(session.Query<Rating>().ToList());
             }
             return rating;
+        }
+
+        public void Clear<T>()
+        {
+            using (IDocumentSession session = DocumentStoreHolder.Store.OpenSession())
+            {
+                var objects = session.Query<T>().ToList();
+                while (objects.Any())
+                {
+                    foreach (var obj in objects)
+                    {
+                        session.Delete(obj);
+                    }
+
+                    session.SaveChanges();
+                    objects = session.Query<T>().ToList();
+                }
+            }
         }
 
         public Game? GetGame(long gameId)

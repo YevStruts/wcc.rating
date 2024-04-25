@@ -186,6 +186,9 @@ namespace wcc.rating.kernel.RequestHandlers
 
         public Task<bool> Handle(AddRatingQuery request, CancellationToken cancellationToken)
         {
+            _db.Clear<Rating>();
+            _db.Clear<Game>();
+
             var rating = _mapper.Map<List<Rating>>(request.Rating);
             return Task.FromResult(_db.SaveRating(rating));
         }
