@@ -18,10 +18,10 @@ namespace wcc.rating.api.Controllers
             _mediator = mediator;
         }
 
-        [HttpPost, Route("Save")]
-        public Task Save(GameModel model)
+        [HttpPost, Route("save")]
+        public async Task<bool> Save(GameModel model)
         {
-            return _mediator.Send(new SaveGameQuery(model));
+            return await _mediator.Send(new SaveGameQuery(model));
         }
     }
 }

@@ -8,7 +8,7 @@ namespace wcc.rating.Infrastructure
 {
     public class Rating
     {
-        public long PlayerId { get; set; }
+        public string PlayerId { get; set; }
         public int Points { get; set; }
     }
 }

@@ -53,21 +53,21 @@ namespace wcc.rating.kernel.RequestHandlers
             List<Game> games = _db.GetGames().OrderBy(e => e.GameId).ToList();
             foreach (var game in games)
             {
-                if (game.HScore == 0 && game.VScore == 0)
+                if (game.ScoreA == 0 && game.ScoreB == 0)
                     continue;
 
                 if (game.GameType == GameType.Teams &&
-                    (game.HParticipants == null || game.VParticipants == null ||
-                    !game.HParticipants.Any() || !game.VParticipants.Any()))
+                    (game.SideA == null || game.SideB == null ||
+                    !game.SideA.Any() || !game.SideB.Any()))
                     continue;
 
-                var scores = ScoreHelper.GetBO3Score(game.HScore, game.VScore);
+                var scores = ScoreHelper.GetBO3Score(game.ScoreA, game.ScoreB);
 
                 if (game.GameType == GameType.Individual)
                 {
-                    var hRating = getAndAddRatingIfMissing(game.HPlayerId, ref model);
+                    var hRating = getAndAddRatingIfMissing(game.SideA.First(), ref model);
 
-                    var vRating = getAndAddRatingIfMissing(game.VPlayerId, ref model);
+                    var vRating = getAndAddRatingIfMissing(game.SideB.First(), ref model);
 
                     var modelOrdered = model.OrderByDescending(p => p.Points).ToList();
 
@@ -79,36 +79,36 @@ namespace wcc.rating.kernel.RequestHandlers
                     if (vPosition == -1) vPosition = model.Count + 1;
                     double vFactor = EloHelper.GetKFactor(vPosition);
 
-                    if (game.IsTechScored)
-                    {
-                        hFactor /= 2.0;
-                        vFactor /= 2.0;
-                    }
+                    //if (game.IsTechScored)
+                    //{
+                    //    hFactor /= 2.0;
+                    //    vFactor /= 2.0;
+                    //}
 
                     // kFactor of lower rated player
                     double kFactorLower = hPosition > vPosition ? hFactor : vFactor;
 
                     var newRating = EloHelper.Count(hRating.Points, vRating.Points, scores.Item1,
-                        game.HScore >= game.VScore ? hFactor : kFactorLower,
-                        game.VScore >= game.HScore ? vFactor : kFactorLower);
+                        game.ScoreA >= game.ScoreB ? hFactor : kFactorLower,
+                        game.ScoreB >= game.ScoreA ? vFactor : kFactorLower);
 
                     var hprogress = Convert.ToInt32(newRating.Item1);
                     var vprogress = Convert.ToInt32(newRating.Item2);
 
-                    model.First(p => p.PlayerId == GetPlayerIdQuickFix(game.HPlayerId)).Points = hprogress;
-                    model.First(p => p.PlayerId == GetPlayerIdQuickFix(game.VPlayerId)).Points = vprogress;
+                    model.First(p => p.PlayerId == GetPlayerIdQuickFix(game.SideA.First()).ToString()).Points = hprogress;
+                    model.First(p => p.PlayerId == GetPlayerIdQuickFix(game.SideB.First()).ToString()).Points = vprogress;
                 }
                 else if (game.GameType == GameType.Teams)
                 {
                     List<RatingModel> hRatingTeam = new List<RatingModel>();
-                    foreach (var playerId in game.HParticipants)
+                    foreach (var playerId in game.SideA)
                     {
                         hRatingTeam.Add(getAndAddRatingIfMissing(playerId, ref model));
                     }
                     var hRatingAverage = hRatingTeam.Select(r => r.Points).Average();
 
                     List<RatingModel> vRatingTeam = new List<RatingModel>();
-                    foreach (var playerId in game.VParticipants)
+                    foreach (var playerId in game.SideB)
                     {
                         vRatingTeam.Add(getAndAddRatingIfMissing(playerId, ref model));
                     }
@@ -138,11 +138,11 @@ namespace wcc.rating.kernel.RequestHandlers
                     }
                     var vFactor = vFactorList.Average();
 
-                    if (game.IsTechScored)
-                    {
-                        hFactor /= 2.0;
-                        vFactor /= 2.0;
-                    }
+                    //if (game.IsTechScored)
+                    //{
+                    //    hFactor /= 2.0;
+                    //    vFactor /= 2.0;
+                    //}
 
                     // kFactor of lower rated player
                     double kFactorLower =
@@ -151,31 +151,31 @@ namespace wcc.rating.kernel.RequestHandlers
 
                     // Rating progress
                     var newRating = EloHelper.Count(hRatingAverage, vRatingAverage, scores.Item1,
-                        game.HScore >= game.VScore ? hFactor : kFactorLower,
-                        game.VScore >= game.HScore ? vFactor : kFactorLower);
+                        game.ScoreA >= game.ScoreB ? hFactor : kFactorLower,
+                        game.ScoreB >= game.ScoreA ? vFactor : kFactorLower);
 
                     var hprogress = Convert.ToInt32(newRating.Item1 - hRatingAverage);
                     var vprogress = Convert.ToInt32(newRating.Item2 - vRatingAverage);
 
                     // if team won 1-0 and has regress then set progress equeals 0
-                    if (game.HScore >= game.VScore && hprogress < 0) hprogress /= 5;
-                    if (game.HScore <= game.VScore && hprogress > 0) hprogress /= 5;
+                    if (game.ScoreA >= game.ScoreB && hprogress < 0) hprogress /= 5;
+                    if (game.ScoreA <= game.ScoreB && hprogress > 0) hprogress /= 5;
 
-                    if (game.VScore >= game.HScore && vprogress < 0) vprogress /= 5;
-                    if (game.VScore <= game.HScore && vprogress > 0) vprogress /= 5;
+                    if (game.ScoreB >= game.ScoreA && vprogress < 0) vprogress /= 5;
+                    if (game.ScoreB <= game.ScoreA && vprogress > 0) vprogress /= 5;
 
                     // if lose reduce lost points twice
-                    if (game.HScore >= game.VScore) vprogress /= 2;
-                    if (game.VScore >= game.HScore) hprogress /= 2;
+                    if (game.ScoreA >= game.ScoreB) vprogress /= 2;
+                    if (game.ScoreB >= game.ScoreA) hprogress /= 2;
 
-                    foreach (var playerId in game.HParticipants)
+                    foreach (var playerId in game.SideA)
                     {
-                        model.First(p => p.PlayerId == GetPlayerIdQuickFix(playerId)).Points += hprogress;
+                        model.First(p => p.PlayerId == GetPlayerIdQuickFix(playerId).ToString()).Points += hprogress;
                     }
 
-                    foreach (var playerId in game.VParticipants)
+                    foreach (var playerId in game.SideB)
                     {
-                        model.First(p => p.PlayerId == GetPlayerIdQuickFix(playerId)).Points += vprogress;
+                        model.First(p => p.PlayerId == GetPlayerIdQuickFix(playerId).ToString()).Points += vprogress;
                     }
                 }
             }
@@ -193,28 +193,28 @@ namespace wcc.rating.kernel.RequestHandlers
             return Task.FromResult(_db.SaveRating(rating));
         }
 
-        private RatingModel getAndAddRatingIfMissing(long playerId, ref List<RatingModel> model)
+        private RatingModel getAndAddRatingIfMissing(string playerId, ref List<RatingModel> model)
         {
-            if (!model.Any(r => r.PlayerId == GetPlayerIdQuickFix(playerId)))
+            if (!model.Any(r => r.PlayerId == GetPlayerIdQuickFix(playerId).ToString()))
             {
-                model.Add(new RatingModel() { PlayerId = playerId, Points = 1000 });
+                model.Add(new RatingModel() { PlayerId = playerId.ToString(), Points = 1000 });
             }
 
-            return model.First(r => r.PlayerId == GetPlayerIdQuickFix(playerId));
+            return model.First(r => r.PlayerId == GetPlayerIdQuickFix(playerId).ToString());
         }
 
-        private long GetPlayerIdQuickFix(long playerId)
+        private string GetPlayerIdQuickFix(string playerId)
         {
-            if (playerId == 97 /* fenrir-miracle */) 
-                return 44;
-            if (playerId == 157 /* supermati-spoxmati */)
-                return 56; 
-            if (playerId == 151 /* DaronirYT */)
-                return 136;
-            if (playerId == 183 /* [PR]ELENDOR */)
-                return 159;
-            if (playerId == 158 /* Sake */)
-                return 135;
+            if (playerId == 97.ToString() /* fenrir-miracle */) 
+                return 44.ToString();
+            if (playerId == 157.ToString() /* supermati-spoxmati */)
+                return 56.ToString(); 
+            if (playerId == 151.ToString() /* DaronirYT */)
+                return 136.ToString();
+            if (playerId == 183.ToString() /* [PR]ELENDOR */)
+                return 159.ToString();
+            if (playerId == 158.ToString() /* Sake */)
+                return 135.ToString();
             return playerId;
         }
     }

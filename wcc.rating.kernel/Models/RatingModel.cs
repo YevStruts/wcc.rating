@@ -8,7 +8,7 @@ namespace wcc.rating.kernel.Models
 {
     public class RatingModel
     {
-        public long PlayerId { get; set; }
+        public string PlayerId { get; set; }
         public int Points { get; set; }
     }
 }

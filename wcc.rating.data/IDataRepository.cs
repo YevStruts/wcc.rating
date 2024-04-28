@@ -11,12 +11,12 @@ namespace wcc.rating.data
     {
         bool SaveRating(List<Rating> rating);
         List<Rating> GetRating();
-        Game GetGame(long gameId);
+        Game GetGame(string gameId);
         List<Game> GetGames();
         bool SaveGame(Game game);
         bool SaveGames(List<Game> games);
 
-        Rank GetRank(long playerId);
+        Rank GetRank(string playerId);
         List<Rank> GetRanks();
         bool SaveRanks(int rankId, List<Rank> ranks);
         void Clear<T>();

@@ -15,15 +15,11 @@ namespace wcc.rating.Infrastructure
         {
             GameType = GameType.Individual;
         }
-
-        public long GameId { get; set; }
-        public long HPlayerId { get; set; }
-        public int HScore { get; set; }
-        public long VPlayerId { get; set; }
-        public int VScore { get; set; }
-        public bool IsTechScored { get; set; }
+        public string GameId { get; set; }
         public GameType GameType { get; set; }
-        public List<long>? HParticipants { get; set; }
-        public List<long>? VParticipants { get; set; }
+        public List<string> SideA { get; set; }
+        public List<string> SideB { get; set; }
+        public int ScoreA { get; set; }
+        public int ScoreB { get; set; }
     }
 }

@@ -65,7 +65,7 @@ namespace wcc.rating.data
             }
         }
 
-        public Game? GetGame(long gameId)
+        public Game? GetGame(string gameId)
         {
             using (IDocumentSession session = DocumentStoreHolder.Store.OpenSession())
             {
@@ -88,20 +88,20 @@ namespace wcc.rating.data
                 var gameDto = session.Query<Game>().Where(x => x.GameId == game.GameId).FirstOrDefault();
                 if (gameDto != null)
                 {
-                    gameDto.HPlayerId = game.HPlayerId;
-                    gameDto.HScore = game.HScore;
-                    gameDto.VPlayerId = game.VPlayerId;
-                    gameDto.VScore = game.VScore;
+                    gameDto.SideA = game.SideA;
+                    gameDto.ScoreA = game.ScoreA;
+                    gameDto.SideB = game.SideB;
+                    gameDto.ScoreB = game.ScoreB;
                 }
                 else
                 {
                     gameDto = new Game
                     {
                         GameId = game.GameId,
-                        HPlayerId = game.HPlayerId,
-                        HScore = game.HScore,
-                        VPlayerId = game.VPlayerId,
-                        VScore = game.VScore
+                        SideA = game.SideA,
+                        ScoreA = game.ScoreA,
+                        SideB = game.SideB,
+                        ScoreB = game.ScoreB
                     };
                     session.Store(game);
                 }
@@ -123,7 +123,7 @@ namespace wcc.rating.data
 
         #region Rank
 
-        public Rank? GetRank(long playerId)
+        public Rank? GetRank(string playerId)
         {
             using (IDocumentSession session = DocumentStoreHolder.Store.OpenSession())
             {
