@@ -50,7 +50,7 @@ namespace wcc.rating.kernel.RequestHandlers
             rating.ForEach(r => model.Add(_mapper.Map<RatingModel>(r)));
 
             #region Calculate rating
-            List<Game> games = _db.GetGames().OrderBy(e => e.GameId).ToList();
+            List<Game> games = _db.GetGames().ToList();
             foreach (var game in games)
             {
                 if (game.ScoreA == 0 && game.ScoreB == 0)
