@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
 using MediatR;
+using Microsoft.Extensions.Logging;
+using Sparrow.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,11 +36,13 @@ namespace wcc.rating.kernel.RequestHandlers
         IRequestHandler<GetRatingQuery, List<RatingModel>>,
         IRequestHandler<AddRatingQuery, bool>
     {
+        protected readonly ILogger<RatingHandler>? _logger;
         private readonly IDataRepository _db;
         private readonly IMapper _mapper = MapperHelper.Instance;
 
-        public RatingHandler(IDataRepository db)
+        public RatingHandler(ILogger<RatingHandler>? logger, IDataRepository db)
         {
+            _logger = logger;
             _db = db;
         }
 
@@ -66,7 +70,6 @@ namespace wcc.rating.kernel.RequestHandlers
                 if (game.GameType == GameType.Individual)
                 {
                     var hRating = getAndAddRatingIfMissing(game.SideA.First(), ref model);
-
                     var vRating = getAndAddRatingIfMissing(game.SideB.First(), ref model);
 
                     var modelOrdered = model.OrderByDescending(p => p.Points).ToList();
@@ -95,8 +98,16 @@ namespace wcc.rating.kernel.RequestHandlers
                     var hprogress = Convert.ToInt32(newRating.Item1);
                     var vprogress = Convert.ToInt32(newRating.Item2);
 
+                    var hPoints = hRating.Points;
+                    var vPoints = vRating.Points;
+
                     model.First(p => p.PlayerId == GetPlayerIdQuickFix(game.SideA.First()).ToString()).Points = hprogress;
                     model.First(p => p.PlayerId == GetPlayerIdQuickFix(game.SideB.First()).ToString()).Points = vprogress;
+
+                    _logger.LogTrace($"-----------------------------");
+                    _logger.LogTrace($"Game: {game.SideA.First()} vs {game.SideB.First()} {game.ScoreA}-{game.ScoreB}");
+                    _logger.LogTrace($"Player A: {game.SideA.First()} old:{hPoints} new:{hprogress}");
+                    _logger.LogTrace($"Player B: {game.SideB.First()} old:{vPoints} new:{vprogress}");
                 }
                 else if (game.GameType == GameType.Teams)
                 {
