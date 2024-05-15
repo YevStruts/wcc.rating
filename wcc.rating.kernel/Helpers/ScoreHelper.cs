@@ -19,7 +19,11 @@
             if (score1 == 1 && score2 == 1)
                 return Tuple.Create(0.5f, 0.5f);
 
-            return Tuple.Create(0.0f, 0.0f);
+            var total = score1 + score2;
+            return Tuple.Create(
+                score1 == total ? 1.0f : score1 / (float)total,
+                score2 == total ? 1.0f : score2 / (float)total
+            );
         }
     }
 }

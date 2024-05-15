@@ -98,6 +98,18 @@ namespace wcc.rating.kernel.RequestHandlers
                     var hprogress = Convert.ToInt32(newRating.Item1);
                     var vprogress = Convert.ToInt32(newRating.Item2);
 
+                    /* corection avoid reducing scores if won */
+                    if (game.ScoreA > game.ScoreB && hprogress < hRating.Points)
+                    {
+                        hprogress = hRating.Points + 1;
+                        vprogress = vRating.Points - 1;
+                    }
+                    if (game.ScoreB > game.ScoreA && vprogress < vRating.Points)
+                    {
+                        hprogress = hRating.Points - 1;
+                        vprogress = vRating.Points + 1;
+                    }
+
                     var hPoints = hRating.Points;
                     var vPoints = vRating.Points;
 
