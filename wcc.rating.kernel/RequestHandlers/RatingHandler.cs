@@ -65,7 +65,7 @@ namespace wcc.rating.kernel.RequestHandlers
                     !game.SideA.Any() || !game.SideB.Any()))
                     continue;
 
-                var scores = ScoreHelper.GetBO3Score(game.ScoreA, game.ScoreB);
+                var scores = ScoreHelper.GetBOScore(game.ScoreA, game.ScoreB);
 
                 if (game.GameType == GameType.Individual)
                 {
@@ -99,15 +99,11 @@ namespace wcc.rating.kernel.RequestHandlers
                     var vprogress = Convert.ToInt32(newRating.Item2);
 
                     /* corection avoid reducing scores if won */
-                    if (game.ScoreA > game.ScoreB && hprogress < hRating.Points)
+                    if (game.ScoreA > game.ScoreB && hprogress < hRating.Points ||
+                        game.ScoreB > game.ScoreA && vprogress < vRating.Points)
                     {
-                        hprogress = hRating.Points + 1;
-                        vprogress = vRating.Points - 1;
-                    }
-                    if (game.ScoreB > game.ScoreA && vprogress < vRating.Points)
-                    {
-                        hprogress = hRating.Points - 1;
-                        vprogress = vRating.Points + 1;
+                        hprogress = hRating.Points;
+                        vprogress = vRating.Points;
                     }
 
                     var hPoints = hRating.Points;
