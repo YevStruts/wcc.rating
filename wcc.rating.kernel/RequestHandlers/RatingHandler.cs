@@ -224,16 +224,18 @@ namespace wcc.rating.kernel.RequestHandlers
 
         private string GetPlayerIdQuickFix(string playerId)
         {
-            if (playerId == 97.ToString() /* fenrir-miracle */) 
-                return 44.ToString();
-            if (playerId == 157.ToString() /* supermati-spoxmati */)
-                return 56.ToString(); 
-            if (playerId == 151.ToString() /* DaronirYT */)
-                return 136.ToString();
-            if (playerId == 183.ToString() /* [PR]ELENDOR */)
-                return 159.ToString();
-            if (playerId == 158.ToString() /* Sake */)
-                return 135.ToString();
+            if ((new string[] { "players/43-A", "players/94-A" }).Contains(playerId) /* fenrir-miracle */) 
+                return "players/43-A";
+            if ((new string[] { "players/54-A", "players/152-A", "players/173-A" }).Contains(playerId) /* supermati-spoxmati */)
+                return "players/173-A"; 
+            //if (playerId == 151.ToString() /* DaronirYT */)
+            //    return 136.ToString();
+            if ((new string[] { "players/154-A", "players/171-A" }).Contains(playerId) /* [PR]ELENDOR */)
+                return "players/171-A";
+            if ((new string[] { "players/132-A", "players/153-A" }).Contains(playerId) /* Sake */)
+                return "players/132-A";
+            if ((new string[] { "players/241-A", "players/177-A" }).Contains(playerId) /* Danny */)
+                return "players/241-A";
             return playerId;
         }
     }
