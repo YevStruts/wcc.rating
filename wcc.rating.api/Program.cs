@@ -21,7 +21,7 @@ var app = builder.Build();
 
 string ravenDbUrl = $"/{environment}/wcc-rating/ravendb";
 var ravenDbSettings = await AWSParameterStore.Instance().GetParameterAsync(ravenDbUrl);
-DocumentStoreHolder.Init(app.Configuration.GetConnectionString("DefaultConnection"));
+DocumentStoreHolder.Init(ravenDbSettings);
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
