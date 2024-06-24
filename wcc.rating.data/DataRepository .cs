@@ -121,6 +121,30 @@ namespace wcc.rating.data
             return true;
         }
 
+        public bool DeleteGameByCoreGameId(string gameId)
+        {
+            using (IDocumentSession session = DocumentStoreHolder.Store.OpenSession())
+            {
+                var games = session.Query<Game>().Where(game => game.GameId == gameId).ToList();
+                foreach (var game in games)
+                {
+                    session.Delete(game);
+                }
+                session.SaveChanges();
+            }
+            return true;
+        }
+
+        public bool DeleteGame(string gameId)
+        {
+            using (IDocumentSession session = DocumentStoreHolder.Store.OpenSession())
+            {
+                session.Delete(gameId);
+                session.SaveChanges();
+            }
+            return true;
+        }
+
         #region Rank
 
         public Rank? GetRank(string playerId)

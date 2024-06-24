@@ -15,6 +15,8 @@ namespace wcc.rating.data
         List<Game> GetGames();
         bool SaveGame(Game game);
         bool SaveGames(List<Game> games);
+        bool DeleteGameByCoreGameId(string gameId);
+        bool DeleteGame(string gameId);
 
         Rank GetRank(string playerId);
         List<Rank> GetRanks();
