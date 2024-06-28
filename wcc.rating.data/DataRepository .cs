@@ -187,5 +187,18 @@ namespace wcc.rating.data
         }
 
         #endregion
+
+        #region Checkpoint
+        public bool SaveCheckpoint(Checkpoint checkpoint)
+        {
+            using (IDocumentSession session = DocumentStoreHolder.Store.OpenSession())
+            {
+                session.Store(checkpoint);
+                session.SaveChanges();
+            }
+            return true;
+        }
+
+        #endregion Checkpoint
     }
 }

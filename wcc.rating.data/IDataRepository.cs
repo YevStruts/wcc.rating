@@ -22,5 +22,7 @@ namespace wcc.rating.data
         List<Rank> GetRanks();
         bool SaveRanks(int rankId, List<Rank> ranks);
         void Clear<T>();
+
+        bool SaveCheckpoint(Checkpoint game);
     }
 }

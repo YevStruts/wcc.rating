@@ -203,13 +203,13 @@ namespace wcc.rating.kernel.RequestHandlers
             return Task.FromResult(model.OrderBy(r => r.Points).ToList());
         }
 
-        public Task<bool> Handle(AddRatingQuery request, CancellationToken cancellationToken)
+        public async Task<bool> Handle(AddRatingQuery request, CancellationToken cancellationToken)
         {
             _db.Clear<Rating>();
             _db.Clear<Game>();
 
             var rating = _mapper.Map<List<Rating>>(request.Rating);
-            return Task.FromResult(_db.SaveRating(rating));
+            return _db.SaveRating(rating) && _db.SaveCheckpoint(new Checkpoint { DateTime = DateTime.UtcNow });
         }
 
         private RatingModel getAndAddRatingIfMissing(string playerId, ref List<RatingModel> model)
