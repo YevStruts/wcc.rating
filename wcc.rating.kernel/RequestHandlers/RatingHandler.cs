@@ -12,6 +12,10 @@ using wcc.rating.data;
 using wcc.rating.Infrastructure;
 using wcc.rating.kernel.Helpers;
 using wcc.rating.kernel.Models;
+using Microservices = wcc.rating.kernel.Models.Microservices;
+using Core = wcc.rating.kernel.Models.Microservices.Core;
+using System.Web;
+using wcc.rating.kernel.Models.Microservices.Core;
 
 namespace wcc.rating.kernel.RequestHandlers
 {
@@ -32,18 +36,28 @@ namespace wcc.rating.kernel.RequestHandlers
         }
     }
 
+    public class EvolveRatingQuery : IRequest<bool>
+    {
+        public EvolveRatingQuery()
+        {
+        }
+    }
+
     public class RatingHandler :
         IRequestHandler<GetRatingQuery, List<RatingModel>>,
-        IRequestHandler<AddRatingQuery, bool>
+        IRequestHandler<AddRatingQuery, bool>,
+        IRequestHandler<EvolveRatingQuery, bool>
     {
         protected readonly ILogger<RatingHandler>? _logger;
         private readonly IDataRepository _db;
         private readonly IMapper _mapper = MapperHelper.Instance;
+        private readonly Microservices.Config _mcsvcConfig;
 
-        public RatingHandler(ILogger<RatingHandler>? logger, IDataRepository db)
+        public RatingHandler(ILogger<RatingHandler>? logger, IDataRepository db, Microservices.Config mcsvcConfig)
         {
             _logger = logger;
             _db = db;
+            _mcsvcConfig = mcsvcConfig;
         }
 
         public Task<List<RatingModel>> Handle(GetRatingQuery request, CancellationToken cancellationToken)
@@ -210,6 +224,38 @@ namespace wcc.rating.kernel.RequestHandlers
 
             var rating = _mapper.Map<List<Rating>>(request.Rating);
             return _db.SaveRating(rating) && _db.SaveCheckpoint(new Checkpoint { DateTime = DateTime.UtcNow });
+        }
+
+        public async Task<bool> Handle(EvolveRatingQuery request, CancellationToken cancellationToken)
+        {
+            var players = await new ApiCaller(_mcsvcConfig.CoreUrl).GetAsync<List<Core.PlayerModel>>("api/player");
+
+            var rating = await Handle(new GetRatingQuery(), cancellationToken);
+
+            var date = DateTime.UtcNow;
+            foreach (var r in rating)
+            {
+                var player = players.FirstOrDefault(p => p.Id == r.PlayerId);
+                if (player == null) continue;
+
+                var games = await new ApiCaller(_mcsvcConfig.CoreUrl).GetAsync<List<Core.GameModel>>($"api/game/player/{HttpUtility.UrlEncode(player.Id)}");
+                
+                var lastGame = games.FirstOrDefault();
+                if (lastGame != null)
+                {
+                    var daysSinceLastGame = (DateTime.UtcNow - lastGame.Scheduled).Days;
+                    if (daysSinceLastGame > 30 /* -5 points */)
+                    {
+                        r.Points -= 5;
+                    }
+                    if (daysSinceLastGame > 180 /* becoma Innactive */)
+                    {
+                        player.IsActive = false;
+                        await new ApiCaller(_mcsvcConfig.CoreUrl).PostAsync<PlayerModel, bool>($"api/player", player);
+                    }
+                }
+            }
+            return await Handle(new AddRatingQuery(rating), cancellationToken);
         }
 
         private RatingModel getAndAddRatingIfMissing(string playerId, ref List<RatingModel> model)

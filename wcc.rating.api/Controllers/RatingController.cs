@@ -29,5 +29,11 @@ namespace wcc.rating.api.Controllers
         {
             return _mediator.Send(new AddRatingQuery(rating));
         }
+
+        [HttpPost, Route("evolve")]
+        public Task Evolve()
+        {
+            return _mediator.Send(new EvolveRatingQuery());
+        }
     }
 }

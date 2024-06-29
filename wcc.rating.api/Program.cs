@@ -1,6 +1,7 @@
 using wcc.rating.data;
 using wcc.rating.kernel.RequestHandlers;
 using wcc.rating.api.Helpers;
+using Microservices = wcc.rating.kernel.Models.Microservices;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,6 +10,16 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 
 var environment = builder.Configuration.GetValue("Environment", "dev");
+
+string microservicesSettingsPath = $"/{environment}/microservices";
+var microservicesSettings = await AWSParameterStore.Instance().GetParametersByPathAsync(microservicesSettingsPath);
+Microservices.Config mcsvcConfig = new Microservices.Config
+{
+    CoreUrl = microservicesSettings[$"{microservicesSettingsPath}/core-url"],
+    RatingUrl = microservicesSettings[$"{microservicesSettingsPath}/rating-url"],
+    WidgetUrl = microservicesSettings[$"{microservicesSettingsPath}/widget-url"]
+};
+builder.Services.AddSingleton<Microservices.Config>(mcsvcConfig);
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
