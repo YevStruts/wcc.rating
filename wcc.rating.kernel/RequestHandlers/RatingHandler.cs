@@ -239,7 +239,7 @@ namespace wcc.rating.kernel.RequestHandlers
                 if (player == null) continue;
 
                 var games = await new ApiCaller(_mcsvcConfig.CoreUrl).GetAsync<List<Core.GameModel>>($"api/game/player/{HttpUtility.UrlEncode(player.Id)}");
-                
+
                 var lastGame = games.FirstOrDefault();
                 if (lastGame != null)
                 {
@@ -248,7 +248,7 @@ namespace wcc.rating.kernel.RequestHandlers
                     {
                         r.Points -= 5;
                     }
-                    if (daysSinceLastGame > 180 /* becoma Innactive */)
+                    if (daysSinceLastGame > 364 /* becoma Innactive */)
                     {
                         player.IsActive = false;
                         await new ApiCaller(_mcsvcConfig.CoreUrl).PostAsync<PlayerModel, bool>($"api/player", player);

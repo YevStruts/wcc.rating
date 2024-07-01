@@ -31,9 +31,9 @@ namespace wcc.rating.api.Controllers
         }
 
         [HttpPost, Route("evolve")]
-        public Task Evolve()
+        public async Task<bool> Evolve()
         {
-            return _mediator.Send(new EvolveRatingQuery());
+            return await _mediator.Send(new EvolveRatingQuery());
         }
     }
 }
