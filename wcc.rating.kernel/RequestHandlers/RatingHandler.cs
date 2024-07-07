@@ -282,6 +282,8 @@ namespace wcc.rating.kernel.RequestHandlers
                 return "players/132-A";
             if ((new string[] { "players/241-A", "players/177-A" }).Contains(playerId) /* Danny */)
                 return "players/241-A";
+            if ((new string[] { "players/388-A" }).Contains(playerId) /* Husarz */)
+                return "players/144-A";
             return playerId;
         }
     }
