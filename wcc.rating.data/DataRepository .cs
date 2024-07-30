@@ -200,5 +200,79 @@ namespace wcc.rating.data
         }
 
         #endregion Checkpoint
+
+        #region RatingGame
+        public List<RatingGame1x1> GetRatingGames()
+        {
+            List<RatingGame1x1> ratingGames = new List<RatingGame1x1>();
+            using (IDocumentSession session = DocumentStoreHolder.Store.OpenSession())
+            {
+                ratingGames.AddRange(session.Query<RatingGame1x1>().ToList());
+            }
+            return ratingGames;
+        }
+
+        public RatingGame1x1? GetRatingGame(string id)
+        {
+            using (IDocumentSession session = DocumentStoreHolder.Store.OpenSession())
+            {
+                return session.Query<RatingGame1x1>().FirstOrDefault(g => g.Id == id);
+            }
+        }
+
+        public bool SaveRatingGame(RatingGame1x1 ratingGame)
+        {
+            using (IDocumentSession session = DocumentStoreHolder.Store.OpenSession())
+            {
+                var ratingGameDto = session.Query<RatingGame1x1>().Where(x => x.Id == ratingGame.Id).FirstOrDefault();
+                if (ratingGameDto != null)
+                {
+                    ratingGameDto.MessageId = ratingGame.MessageId;
+                    ratingGameDto.UserId = ratingGame.UserId;
+                    ratingGameDto.ChannelId = ratingGame.ChannelId;
+                    ratingGameDto.Status = ratingGame.Status;
+                    ratingGameDto.Created = ratingGame.Created;
+
+                    ratingGameDto.Settings.Nation = ratingGame.Settings.Nation;
+                    ratingGameDto.Settings.Option = ratingGame.Settings.Option;
+                    ratingGameDto.Settings.OpponentRating = ratingGame.Settings.OpponentRating;
+                    ratingGameDto.Settings.Availability = ratingGame.Settings.Availability;
+                }                 
+                else              
+                {
+                    ratingGameDto = new RatingGame1x1
+                    {
+                        MessageId = ratingGame.MessageId,
+                        UserId = ratingGame.UserId,
+                        ChannelId = ratingGame.ChannelId,
+                        Status = ratingGame.Status,
+                        Created = ratingGame.Created,
+
+                        Settings = new RatingGameSettings1x1()
+                        {
+                            Nation = ratingGame.Settings.Nation,
+                            Option = ratingGame.Settings.Option,
+                            OpponentRating = ratingGame.Settings.OpponentRating,
+                            Availability = ratingGame.Settings.Availability,
+                        }
+                    };
+                    session.Store(ratingGameDto);
+                }
+                session.SaveChanges();
+            }
+            return true;
+        }
+
+        public bool DeleteRatingGame(string id)
+        {
+            using (IDocumentSession session = DocumentStoreHolder.Store.OpenSession())
+            {
+                session.Delete(id);
+                session.SaveChanges();
+            }
+            return true;
+        }
+
+        #endregion
     }
 }

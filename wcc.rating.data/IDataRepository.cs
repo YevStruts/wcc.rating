@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using wcc.rating.Infrastructure;
+﻿using wcc.rating.Infrastructure;
 
 namespace wcc.rating.data
 {
@@ -24,5 +19,11 @@ namespace wcc.rating.data
         void Clear<T>();
 
         bool SaveCheckpoint(Checkpoint game);
+
+        /* RatingGame */
+        List<RatingGame1x1> GetRatingGames();
+        RatingGame1x1? GetRatingGame(string id);
+        bool SaveRatingGame(RatingGame1x1 ratingGame);
+        bool DeleteRatingGame(string id);
     }
 }
