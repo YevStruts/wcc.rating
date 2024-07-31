@@ -10,7 +10,6 @@ namespace wcc.rating.Infrastructure
 
         public GameStatus Status { get; set; }
         public DateTime Created { get; set; }
-        public int Rating { get; set; }
         public RatingGameSettings1x1 Settings { get; set; }
     }
 }

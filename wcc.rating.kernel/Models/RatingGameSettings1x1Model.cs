@@ -13,5 +13,6 @@ namespace wcc.rating.kernel.Models
         public WCCOptions Option { get; set; }
         public OpponentRating OpponentRating { get; set; }
         public Availability Availability { get; set; }
+        public GameType GameType { get; set; }
     }
 }
