@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace wcc.rating.Enums
 {
-    public enum GameType
+    public enum WinRule
     {
         Bo1 = 0,
         Bo3 = 1,
