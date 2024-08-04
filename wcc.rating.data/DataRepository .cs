@@ -237,7 +237,7 @@ namespace wcc.rating.data
                     ratingGameDto.Settings.Option = ratingGame.Settings.Option;
                     ratingGameDto.Settings.OpponentRating = ratingGame.Settings.OpponentRating;
                     ratingGameDto.Settings.Availability = ratingGame.Settings.Availability;
-                    ratingGameDto.Settings.GameType = ratingGame.Settings.GameType;
+                    ratingGameDto.Settings.WinRule = ratingGame.Settings.WinRule;
                 }                 
                 else              
                 {
@@ -255,7 +255,7 @@ namespace wcc.rating.data
                             Option = ratingGame.Settings.Option,
                             OpponentRating = ratingGame.Settings.OpponentRating,
                             Availability = ratingGame.Settings.Availability,
-                            GameType = ratingGame.Settings.GameType
+                            WinRule = ratingGame.Settings.WinRule
                         }
                     };
                     session.Store(ratingGameDto);
